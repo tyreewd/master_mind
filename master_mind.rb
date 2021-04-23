@@ -4,8 +4,8 @@ class MasterMind
     def initialize
         @colors = ["red", "blue", "green", "yellow", "purple", "orange"]
         @computer_code = []
-        @red_peg = 0
-        @white_peg = 0
+        @right_color_position = 0
+        @right_color_wrong_position = 0
         @guess = ""
     end
     
@@ -14,41 +14,88 @@ class MasterMind
         4.times do
             @computer_code << @colors.sample
         end
+        @computer_code
     end
 
-    def user_guess   
-         puts "Select four guesses from " +
-            "any comination of red, blue, green, yellow, purple, orange.
-            "
+    def user_guess  
+        puts "" 
+        puts "Break the code! Select four guesses from " +
+            "any comination of red, blue, green, yellow, purple, orange."
+        puts ""   
+        puts ""
         @guess = gets.chomp.split  
     end
 
-    def play_game
-        generate_code
-        @turns = 12
-        while @red_peg < 4 && @turns > 0
+    def the_actual_game
+        @turns = 12 
+        @code = choose_role
+        the_spacer
+        
+        
+        while @right_color_position < 4 && @turns > 0
             user_guess
             i = 0
-            @red_peg = 0
-            @white_peg = 0
+            if @guess[i] == "cheat"
+                p @code
+            end
+            @right_color_position = 0
+            @right_color_wrong_position = 0
             4.times do
-                
-                if @guess[i] == @computer_code[i]
-                    @red_peg += 1
-                elsif @computer_code.any?(@guess[i])
-                    @white_peg += 1
+                if @guess[i] == @code[i]
+                    @right_color_position += 1
+                elsif @code.any?(@guess[i])
+                    @right_color_wrong_position += 1
                 end
                 i += 1
             end
             @turns -= 1
-            puts "There are #{@red_peg} in the right spot and right color" +
-             " and #{@white_peg} in the wrong spot but right color." +
-              " with #{@turns} turns left
-             "
+            puts ""
+            puts ""
+            puts "There are #{@right_color_position} in the right spot and right color" +
+             " and #{@right_color_wrong_position} in the wrong spot but right color." +
+              " with #{@turns} turns left" if @right_color_position != 4
         end
-        puts "Congratulations! The code was #{@computer_code}."
+        if @right_color_position == 4
+            puts ""
+            puts "Congratulations! The code was #{@code}."
+        else
+            puts "You lose. The code was #{@code}."
+        end
     end
 
+    def choose_role
+        puts "Would you like to make the code this round? y/n"
+        @player_role = gets.chomp.downcase
+        return generate_code if @player_role == "n"   
+        return choose_code if @player_role == "y" 
+    end
+
+    def choose_code
+        puts ""
+        puts "Please choose 4 of any combination of red, blue, green," +
+                " yellow, purple, orange. Seperated by spaces."
+        @player_code = gets.chomp.split
+   
+    end 
+
+    def computer_guess
+
+    end
+
+    
+
+    def play_game
+        the_actual_game 
+    end
+
+    #This is necessary for two human players to hide the initial code from
+    #the command line
+    def the_spacer 
+        50.times do
+         puts ""
+        end
+       
+    end
 end
 
 my_game = MasterMind.new()
